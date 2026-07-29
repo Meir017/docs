@@ -1,20 +1,20 @@
 ---
-title: Orleans and Aspire integration
-description: Learn how to integrate Orleans with Aspire for cloud-native development.
-ms.date: 01/21/2026
+title: Orleans and .NET Aspire integration
+description: Learn how to integrate Orleans with .NET Aspire for cloud-native development.
+ms.date: 07/27/2026
 ms.topic: concept-article
 zone_pivot_groups: orleans-version
 ---
 
-# Orleans and Aspire integration
+# Orleans and .NET Aspire integration
 
 :::zone target="docs" pivot="orleans-8-0,orleans-9-0,orleans-10-0"
 
-[Aspire](https://aspire.dev/integrations/frameworks/orleans) provides a streamlined approach to building cloud-native applications with built-in support for Orleans. Starting with Orleans 8.0, you can use Aspire to orchestrate your Orleans cluster, manage backing resources (like Redis or Azure Storage), and automatically configure service discovery, observability, and health checks.
+[.NET Aspire] provides a streamlined approach to building cloud-native applications with built-in support for Orleans. Starting with Orleans 8.0, you can use .NET Aspire to orchestrate your Orleans cluster, manage backing resources (like Redis or Azure Storage), and automatically configure service discovery, observability, and health checks.
 
 ## Overview
 
-Orleans integration with Aspire uses the `Aspire.Hosting.Orleans` package in your AppHost project. This package provides extension methods to:
+Orleans integration with .NET Aspire uses the `Aspire.Hosting.Orleans` package in your AppHost project. This package provides extension methods to:
 
 - Define Orleans as a distributed resource
 - Configure clustering providers (Redis, Azure Storage, ADO.NET)
@@ -25,11 +25,12 @@ Orleans integration with Aspire uses the `Aspire.Hosting.Orleans` package in you
 
 ## Prerequisites
 
-Before using Orleans with Aspire, ensure you have:
+Before using Orleans with .NET Aspire, ensure you have:
 
 - [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) or later
 - [Aspire CLI](https://aspire.dev/get-started/install-cli/)
-- An IDE with Aspire support (Visual Studio 2022 17.9+, VS Code with [`microsoft-aspire.aspire-vscode`](https://marketplace.visualstudio.com/items?itemName=microsoft-aspire.aspire-vscode), or JetBrains Rider)
+
+- An IDE with .NET Aspire support (Visual Studio 2022 17.9+, VS Code with [`microsoft-aspire.aspire-vscode`](https://marketplace.visualstudio.com/items?itemName=microsoft-aspire.aspire-vscode), or JetBrains Rider)
 
 ## Required packages
 
@@ -67,15 +68,15 @@ When your Orleans client runs in a separate process (such as a web frontend), us
 
 ## Configure the Orleans silo project
 
-In your Orleans silo project, configure Orleans to use the Aspire-provided resources:
+In your Orleans silo project, configure Orleans to use the .NET Aspire-provided resources:
 
 :::code language="csharp" source="snippets/aspire/Silo/SiloProgram.cs" id="silo_basic_config":::
 
 > [!TIP]
-> When using Aspire, the parameterless <xref:Microsoft.Extensions.Hosting.GenericHostExtensions.UseOrleans*> is typically all you need. Aspire injects Orleans configuration (cluster ID, service ID, endpoints, and provider settings) via environment variables that Orleans reads automatically. You only need the delegate overload `UseOrleans(siloBuilder => {...})` when you require additional manual configuration beyond what Aspire provides.
+> When using .NET Aspire, the parameterless <xref:Microsoft.Extensions.Hosting.GenericHostExtensions.UseOrleans*> is typically all you need. .NET Aspire injects Orleans configuration (cluster ID, service ID, endpoints, and provider settings) via environment variables that Orleans reads automatically. You only need the delegate overload `UseOrleans(siloBuilder => {...})` when you require additional manual configuration beyond what .NET Aspire provides.
 
 > [!IMPORTANT]
-> You must call the appropriate `AddKeyed*` method (such as `AddKeyedRedisClient`, `AddKeyedAzureTableClient`, or `AddKeyedAzureBlobClient`) to register the backing resource in the dependency injection container. Orleans providers look up resources by their keyed service name—if you skip this step, Orleans won't be able to resolve the resource and will throw a dependency resolution error at runtime. This applies to all Aspire-managed resources used with Orleans.
+> You must call the appropriate `AddKeyed*` method (such as `AddKeyedRedisClient`, `AddKeyedAzureTableClient`, or `AddKeyedAzureBlobClient`) to register the backing resource in the dependency injection container. Orleans providers look up resources by their keyed service name—if you skip this step, Orleans won't be able to resolve the resource and will throw a dependency resolution error at runtime. This applies to all .NET Aspire-managed resources used with Orleans.
 
 ### Configure with explicit connection string
 
@@ -143,21 +144,21 @@ The `Aspire.Hosting.Orleans` package provides these extension methods:
 
 ## Service defaults pattern
 
-Aspire uses a ServiceDefaults project pattern to share common configuration across all projects. For Orleans, this typically includes:
+.NET Aspire uses a ServiceDefaults project pattern to share common configuration across all projects. For Orleans, this typically includes:
 
 ### OpenTelemetry configuration
 
 :::code language="csharp" source="snippets/aspire/ServiceDefaults/Extensions.cs" id="service_defaults":::
 
-## Azure Storage with Aspire
+## Azure Storage with .NET Aspire
 
-You can use Azure Storage resources for Orleans clustering and persistence:
+You can use Azure Storage resources for Orleans clustering and persistence with .NET Aspire:
 
 :::code language="csharp" source="snippets/aspire/AppHost/AppHostExamples.cs" id="azure_storage_aspire":::
 
 ## Development vs. production configuration
 
-Aspire makes it easy to switch between development and production configurations:
+.NET Aspire makes it easy to switch between development and production configurations:
 
 ### Local development (using emulators)
 
@@ -169,7 +170,7 @@ Aspire makes it easy to switch between development and production configurations
 
 ## Health checks
 
-Aspire automatically configures health check endpoints. You can add Orleans-specific health checks:
+.NET Aspire automatically configures health check endpoints. You can add Orleans-specific health checks:
 
 :::code language="csharp" source="snippets/aspire/Silo/SiloProgram.cs" id="health_checks":::
 
@@ -183,29 +184,22 @@ Aspire automatically configures health check endpoints. You can add Orleans-spec
 
 4. **Separate client projects**: For web frontends, use `.AsClient()` to configure Orleans client-only mode.
 
-5. **Use emulators for development**: Aspire can run Redis, Azure Storage (Azurite), and other dependencies locally using containers.
+5. **Use emulators for development**: .NET Aspire can run Redis, Azure Storage (Azurite), and other dependencies locally using containers.
 
 6. **Enable distributed tracing**: Configure OpenTelemetry with Orleans source names to trace grain calls across the cluster.
-
-## See also
-
-- [Aspire overview](https://aspire.dev/get-started/prerequisites/)
-- [Orleans configuration guide](configuration-guide/index.md)
-- [Orleans Redis providers](../grains/grain-persistence/index.md#redis-grain-persistence)
-- [Orleans Azure Storage providers](../grains/grain-persistence/azure-storage.md)
 
 :::zone-end
 
 :::zone target="docs" pivot="orleans-7-0"
 
-Aspire integration was introduced in Orleans 8.0. For Orleans 7.0, you can still deploy to Aspire-orchestrated environments, but the dedicated `Aspire.Hosting.Orleans` package and its extension methods are not available.
+.NET Aspire integration was introduced in Orleans 8.0. For Orleans 7.0, you can still deploy to .NET Aspire-orchestrated environments, but the dedicated `Aspire.Hosting.Orleans` package and its extension methods are not available.
 
-Consider upgrading to Orleans 8.0 or later to take advantage of the Aspire integration features.
+Consider upgrading to Orleans 8.0 or later to take advantage of the .NET Aspire integration features.
 
 :::zone-end
 
 :::zone target="docs" pivot="orleans-3-x"
 
-Aspire integration is available in Orleans 8.0 and later. Orleans 3.x does not support Aspire.
+.NET Aspire integration is available in Orleans 8.0 and later. Orleans 3.x does not support .NET Aspire.
 
 :::zone-end
